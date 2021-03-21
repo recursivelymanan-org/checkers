@@ -40,7 +40,7 @@ public class Board {
                     startIndex[0] += 2;
                 }
                 else {
-                    square = new Square(this, new Piece(Piece.Color.EM), i, j);
+                    square = new Square(this, new Piece(Piece.Color.E), i, j);
                 }
                 squares.add(square);
             });
@@ -53,11 +53,49 @@ public class Board {
     /*
     Takes in a list of Squares representing all jumps in one move, and checks if this move is
     legal before performing the move.
+
+    @param Player player : Player making the move
+    @param List<Square> moves : List of squares that the piece will jump on to make a full move.
+                                Validation for this list takes place in the Game class.
      */
     public void move(Player player, List<Square> moves){
-        if (!checkMove(player, moves)) {
+        Square start = moves.get(0);
+        Square end = moves.get(moves.size() - 1);
+        boolean[] checks = checkMove(player,moves);
+        if (!checks[0]) {
             System.out.println(INVALID_MOVE);
             return;
+        }
+        else {
+            for (List<Square> row : this.board) {
+                for (Square square : row) {
+                    if (square.marked) {
+                        if (player.color == Player.Color.B) {
+                            redCount--;
+                        }
+                        else {
+                            blackCount--;
+                        }
+                        square.piece = new Piece(Piece.Color.E);
+                    }
+                }
+            }
+
+            this.board.get(start.row).get(start.col).piece = new Piece(Piece.Color.E);
+            if (player.color == Player.Color.B) {
+                if (checks[1]) {
+                    this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.BK);
+                }
+                else {
+                    this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.B);
+                }
+            }
+            else {
+                if (checks[1]) {
+                    this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.RK);
+                }
+                this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.R);
+            }
         }
 
     }
@@ -67,13 +105,14 @@ public class Board {
     move" refers to the movement of the checkers piece from the first Square in the list to the
     last Square. Squares in between represent "jumps".
      */
-    public boolean checkMove(Player player, List<Square> moves) {
+    public boolean[] checkMove(Player player, List<Square> moves) {
+        boolean[] values = new boolean[2];
         boolean moveFailed = false; // Tracks if the move failed
         boolean startedKing = moves.get(0).piece.isKing;
         boolean turnedKing = false; // Tracks if piece turned into a king mid-turn
 
-        if (moves.get(0).piece.color == Piece.Color.EM) {
-            return false;
+        if (moves.get(0).piece.color == Piece.Color.E) {
+            return values;
         }
 
         // First loop checks until list is empty OR the first/last row of the board is visited
@@ -166,19 +205,20 @@ public class Board {
             turnedKing = true;
         }
 
+        // If a move was failed, we need to unmark all marked squares, because this move will not
+        // occur
         if (moveFailed) {
             this.unmark();
-            return false;
+            return values;
         }
+
 
         if (turnedKing) {
-            int row = moves.get(0).row;
-            int col = moves.get(0).col;
-            Square square = this.board.get(row).get(col);
-            square.piece.setKing();
+            values[1] = true;
         }
 
-        return true;
+        values[0] = true;
+        return values;
     }
 
 
@@ -190,12 +230,12 @@ public class Board {
         if (target.row < source.row) {
             return false;
         } else if (target.row == source.row + 1) {
-            return target.piece.color == Piece.Color.EM;
+            return target.piece.color == Piece.Color.E;
         } else if (target.row == source.row + 2) {
             capturedRow = average(source.row, target.row);
             capturedCol = average(source.col, target.col);
             captured = this.board.get(capturedRow).get(capturedCol);
-            return captured.piece.color == Piece.Color.RE;
+            return captured.piece.color == Piece.Color.R;
         }
         return false;
     }
@@ -208,14 +248,14 @@ public class Board {
             return false;
         }
         else if (target.row == source.row - 1) {
-            return target.piece.color == Piece.Color.EM;
+            return target.piece.color == Piece.Color.E;
         }
         else if (target.row == source.row - 2) {
             capturedRow = average(source.row, target.row);
             capturedCol = average(source.col, target.col);
             captured = this.board.get(capturedRow).get(capturedCol);
 
-            return captured.piece.color == Piece.Color.BL;
+            return captured.piece.color == Piece.Color.B;
         }
         return false;
     }
@@ -228,14 +268,14 @@ public class Board {
             return false;
         }
         else if (target.row == source.row + 1 || target.row == source.row - 1) {
-            return target.piece.color == Piece.Color.EM;
+            return target.piece.color == Piece.Color.E;
         }
         else if (target.row == source.row + 2 || target.row == source.row - 2) {
             capturedRow = average(source.row, target.row);
             capturedCol = average(source.col, target.col);
             captured = this.board.get(capturedRow).get(capturedCol);
 
-            return captured.piece.color == Piece.Color.RE;
+            return captured.piece.color == Piece.Color.R;
         }
         return false;
     }
@@ -259,6 +299,11 @@ public class Board {
         return (i + j) / 2;
     }
 
+    public void printBoard() {
+        IntStream.range(0, 8).forEach(i -> {
+            System.out.println(this.board.get(i));
+        });
+    }
 
 
 

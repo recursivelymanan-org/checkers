@@ -9,6 +9,12 @@ public class Square {
         this.board = board;
     }
 
+    public Square (Board board, int row, int col) {
+        this.board = board;
+        this.row = row;
+        this.col = col;
+    }
+
     public Square (Board board, Piece piece, int row, int col) {
         this.board = board;
         this.piece = piece;

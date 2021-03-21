@@ -20,21 +20,21 @@ public class Piece {
     }
 
     enum Color {
-        BL,
+        B,
         BK,
-        RE,
+        R,
         RK,
-        EM;
+        E;
 
         public static Color getFromRow(int row) {
             if (row >= 0 && row< 3) {
-                return BL;
+                return B;
             }
             else if (row > 4){
-                return RE;
+                return R;
             }
             else {
-                return EM;
+                return E;
             }
         }
     }

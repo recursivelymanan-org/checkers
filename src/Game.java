@@ -56,12 +56,12 @@ public class Game {
             ArrayList<Integer> intMoves = new ArrayList<>();
 
             System.out.println("It is " + currentPlayer.color + "'s turn. Please enter your move," +
-                    " jump by jump, and then type 'end' when you are done." +
+                    " jump by jump, and then type 'done' when you are done." +
                     ".");
             boolean finish = false;
             while (!finish) {
                 String move = reader.readLine();
-                if ("end".equals(move)) {
+                if ("done".equals(move)) {
                     finish = true;
                 } else {
                     if (!validateUserEntry(move, intMoves)) {

@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Board {
     public static final String INVALID_MOVE = "Invalid move, please enter a valid move";
@@ -59,45 +62,39 @@ public class Board {
                                 Validation for this list takes place in the Game class.
      */
     public void move(Player player, List<Square> moves){
-        Square start = moves.get(0);
-        Square end = moves.get(moves.size() - 1);
         boolean[] checks = checkMove(player,moves);
         if (!checks[0]) {
             System.out.println(INVALID_MOVE);
             return;
         }
-        else {
-            for (List<Square> row : this.board) {
-                for (Square square : row) {
-                    if (square.marked) {
-                        if (player.color == Player.Color.B) {
-                            redCount--;
-                        }
-                        else {
-                            blackCount--;
-                        }
-                        square.piece = new Piece(Piece.Color.E);
+        Square start = moves.get(0);
+        Square end = moves.get(moves.size() - 1);
+        for (List<Square> row : this.board) {
+            for (Square square : row) {
+                if (square.marked) {
+                    if (player.color == Player.Color.B) {
+                        redCount--;
+                    } else {
+                        blackCount--;
                     }
+                    square.piece = new Piece(Piece.Color.E);
                 }
-            }
-
-            this.board.get(start.row).get(start.col).piece = new Piece(Piece.Color.E);
-            if (player.color == Player.Color.B) {
-                if (checks[1]) {
-                    this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.BK);
-                }
-                else {
-                    this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.B);
-                }
-            }
-            else {
-                if (checks[1]) {
-                    this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.RK);
-                }
-                this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.R);
             }
         }
 
+        this.board.get(start.row).get(start.col).piece = new Piece(Piece.Color.E);
+        if (player.color == Player.Color.B) {
+            if (checks[1]) {
+                this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.BK);
+            } else {
+                this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.B);
+            }
+        } else {
+            if (checks[1]) {
+                this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.RK);
+            }
+            this.board.get(end.row).get(end.col).piece = new Piece(Piece.Color.R);
+        }
     }
 
     /*
@@ -107,6 +104,9 @@ public class Board {
      */
     public boolean[] checkMove(Player player, List<Square> moves) {
         boolean[] values = new boolean[2];
+        if (moves.size() < 1) {
+            return values;
+        }
         boolean moveFailed = false; // Tracks if the move failed
         boolean startedKing = moves.get(0).piece.isKing;
         boolean turnedKing = false; // Tracks if piece turned into a king mid-turn
@@ -300,9 +300,17 @@ public class Board {
     }
 
     public void printBoard() {
-        IntStream.range(0, 8).forEach(i -> {
-            System.out.println(this.board.get(i));
-        });
+
+        System.out.println(" _________________ ");
+        for (List<Square> row : board) {
+            System.out.println("| "+
+                    row.stream().
+                    map(Objects::toString).
+                    collect(Collectors.joining(" "))
+                    +" |"
+            );
+        }
+        System.out.println(" _________________ ");
     }
 
 

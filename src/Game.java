@@ -36,51 +36,44 @@ public class Game {
         }
     }
 
-    public void playGame(Game game) throws IOException {
-        int turn = 0;
-        Player currentPlayer;
-        System.out.println("Game starting!");
+    public void play(Game game) throws IOException {
+        Player currentPlayer = blackPlayer;
+        System.out.println("Game starting!\n");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        game.board.printBoard();
-        System.out.println();
 
         while (!game.isGameOver(game.board)) {
-            if (turn % 2 == 0) {
-                currentPlayer = game.blackPlayer;
-            }
-            else {
-                currentPlayer = game.redPlayer;
-            }
-            ArrayList<String> stringMoves = new ArrayList<>();
+            game.board.printBoard();
+            currentPlayer = nextPlayer(currentPlayer);
             ArrayList<Integer> intMoves = new ArrayList<>();
 
-            System.out.println("It is " + currentPlayer.color + "'s turn. Please enter your move," +
-                    " jump by jump, and then type 'end' when you are done." +
-                    ".");
-            boolean finish = false;
-            while (!finish) {
+            System.out.print(currentPlayer.color + ": Please enter your move," +
+                    " jump by jump,(type 'end' when you are done) ->  ");
+            while (true) {
                 String move = reader.readLine();
                 if ("end".equals(move)) {
-                    finish = true;
+                    break;
                 } else {
                     if (!validateUserEntry(move, intMoves)) {
-                        System.out.println("Invalid move, try again.");
-                        finish = true;
+                        System.out.print("Invalid move, try again -> ");
+                        continue;
+                    } else {
+                        ArrayList<Square> squares = (ArrayList<Square>) convertToSquares(game, intMoves);
+                        System.out.println("Moving piece...");
+                        game.board.move(currentPlayer, squares);
                     }
                 }
             }
-            ArrayList<Square> squares = (ArrayList<Square>) convertToSquares(game, intMoves);
-            System.out.println("Taking turn...");
-            game.board.move(currentPlayer, squares);
-
-            System.out.println();
-            game.board.printBoard();
-            System.out.println();
-            turn++;
         }
-
     }
+
+    private Player nextPlayer(Player current) {
+        if (current == blackPlayer) {
+            return redPlayer;
+        }
+        return blackPlayer;
+    }
+
 
     private List<Square> convertToSquares(Game game, ArrayList<Integer> intMoves) {
         ArrayList<Square> squares = new ArrayList<>();
@@ -107,7 +100,7 @@ public class Game {
 
     public static void main(String[] args) throws IOException {
         Game game = new Game();
-        game.playGame(game);
+        game.play(game);
 
         }
 

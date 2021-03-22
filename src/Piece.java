@@ -37,5 +37,21 @@ public class Piece {
                 return E;
             }
         }
+
+        public String toString() {
+            switch (this) {
+                case B:
+                    return "b";
+                case BK:
+                    return "B";
+                case R:
+                    return "r";
+                case RK:
+                    return "R";
+                default:
+                    return "_";
+
+            }
+        }
     }
 }

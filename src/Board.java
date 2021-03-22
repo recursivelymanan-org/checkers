@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Board {
@@ -59,12 +61,16 @@ public class Board {
                                 Validation for this list takes place in the Game class.
      */
     public void move(Player player, List<Square> moves){
+        if (moves.size() < 2) {
+            //System.out.println(INVALID_MOVE);
+            return;
+        }
+
         Square start = moves.get(0);
         Square end = moves.get(moves.size() - 1);
         boolean[] checks = checkMove(player,moves);
         if (!checks[0]) {
             System.out.println(INVALID_MOVE);
-            return;
         }
         else {
             for (List<Square> row : this.board) {
@@ -106,7 +112,8 @@ public class Board {
     last Square. Squares in between represent "jumps".
      */
     public boolean[] checkMove(Player player, List<Square> moves) {
-        boolean[] values = new boolean[2];
+        boolean[] values = new boolean[2]; // First boolean represents success of check, second
+                                           // is true if piece has turned into a king mid-turn
         boolean moveFailed = false; // Tracks if the move failed
         boolean startedKing = moves.get(0).piece.isKing;
         boolean turnedKing = false; // Tracks if piece turned into a king mid-turn
@@ -300,9 +307,16 @@ public class Board {
     }
 
     public void printBoard() {
-        IntStream.range(0, 8).forEach(i -> {
-            System.out.println(this.board.get(i));
-        });
+        System.out.println(" _________________ ");
+        for (List<Square> row : board) {
+            System.out.println("| "+
+                    row.stream().
+                            map(Objects::toString).
+                            collect(Collectors.joining(" "))
+                    +" |"
+            );
+        }
+        System.out.println(" _________________ ");
     }
 
 

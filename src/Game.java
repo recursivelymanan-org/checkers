@@ -11,6 +11,12 @@ public class Game {
     Player blackPlayer;
     Player redPlayer;
 
+    private static final String START_GAME = "Starting game!";
+    private static final String RULES = "Moves must be entered jump by jump. If performing a move" +
+            " with multiple jumps, you should list out all steps to the move. Rows and column " +
+            "coords should be separated by a space, and can be numbers 1-8 (inclusive). Ex:" +
+            "\n3 2\n4 3\nend";
+
     public Game() {
         this.board = new Board();
         this.blackPlayer = new Player(Player.Color.B);
@@ -41,6 +47,8 @@ public class Game {
         Player currentPlayer;
         System.out.println("Game starting!");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        System.out.println(RULES);
 
         game.board.printBoard();
         System.out.println();
@@ -85,8 +93,8 @@ public class Game {
     private List<Square> convertToSquares(Game game, ArrayList<Integer> intMoves) {
         ArrayList<Square> squares = new ArrayList<>();
         while (!intMoves.isEmpty()) {
-            int row = intMoves.remove(0);
-            int col = intMoves.remove(0);
+            int row = intMoves.remove(0) - 1;
+            int col = intMoves.remove(0) - 1;
             squares.add(game.board.board.get(row).get(col));
         }
         return squares;
@@ -97,13 +105,14 @@ public class Game {
         if (coords.length != 2) { return false; }
         Integer row = parseInt(coords[0]);
         Integer col = parseInt(coords[1]);
-        if (row < 0 || row > 7 || col < 0 || col > 7) {
+        if (row < 1 || row > 8 || col < 1 || col > 8) {
             return false;
         }
         moves.add(row);
         moves.add(col);
         return true;
     }
+
 
     public static void main(String[] args) throws IOException {
         Game game = new Game();

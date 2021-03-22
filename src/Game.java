@@ -42,9 +42,18 @@ public class Game {
         }
     }
 
+    public Player nextPlayer(Player player) {
+        if (player.color == Player.Color.R) {
+            return blackPlayer;
+        }
+        else {
+            return redPlayer;
+        }
+    }
+
     public void playGame(Game game) throws IOException {
         int turn = 0;
-        Player currentPlayer;
+        Player currentPlayer = redPlayer;
         System.out.println("Game starting!");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -54,13 +63,7 @@ public class Game {
         System.out.println();
 
         while (!game.isGameOver(game.board)) {
-            if (turn % 2 == 0) {
-                currentPlayer = game.blackPlayer;
-            }
-            else {
-                currentPlayer = game.redPlayer;
-            }
-            ArrayList<String> stringMoves = new ArrayList<>();
+            currentPlayer = nextPlayer(currentPlayer);
             ArrayList<Integer> intMoves = new ArrayList<>();
 
             System.out.println("It is " + currentPlayer.color + "'s turn. Please enter your move," +
@@ -74,7 +77,6 @@ public class Game {
                 } else {
                     if (!validateUserEntry(move, intMoves)) {
                         System.out.println("Invalid move, try again.");
-                        finish = true;
                     }
                 }
             }
